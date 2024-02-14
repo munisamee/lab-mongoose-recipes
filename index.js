@@ -13,11 +13,25 @@ mongoose
   .then(x => {
     console.log(`Connected to the database: "${x.connection.name}"`);
     // Before adding any recipes to the database, let's remove all existing ones
-    return Recipe.deleteMany()
+    return Recipe.deleteOne({ title: 'Carrot Cake' });
   })
   .then(() => {
-    // Run your code here, after you have insured that the connection was made
+    console.log('Successfully removed "Carrot Cake" recipe from the database');
+    // Now let's update the duration for "Rigatoni alla Genovese" recipe
+    return Recipe.findOneAndUpdate(
+      { title: 'Rigatoni alla Genovese' }, // Filter to find the correct recipe
+      { $set: { duration: 100 } }, // Update duration field
+      { new: true } // Return the updated document
+    );
   })
-  .catch(error => {
-    console.error('Error connecting to the database', error);
+  .then((updatedRecipe) => {
+    console.log(`Successfully updated duration for "${updatedRecipe.title}" recipe`);
+    // Close the database connection after all operations are completed
+    return mongoose.connection.close();
+  })
+  .then(() => {
+    console.log('Database connection closed');
+  })
+  .catch((error) => {
+    console.error('Error:', error);
   });
